@@ -25,7 +25,10 @@ class TourismCard extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(tourism.image, fit: BoxFit.cover),
+                child: Hero(
+                  tag: tourism.image,
+                  child: Image.network(tourism.image, fit: BoxFit.cover),
+                ),
               ),
             ),
 
