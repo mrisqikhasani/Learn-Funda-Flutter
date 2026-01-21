@@ -21,7 +21,7 @@ class Tourism {
 }
 
 // Bookmart
-List<Tourism> bookmartTourismList = [];
+// List<Tourism> bookmartTourismList = [];
 
 final List<Tourism> tourismList = [
   Tourism(

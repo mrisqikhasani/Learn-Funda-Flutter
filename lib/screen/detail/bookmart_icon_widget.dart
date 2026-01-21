@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:practice_class/model/tourism.dart';
+import 'package:practice_class/provider/detail/bookmark_icon_provider.dart';
+import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
+import 'package:provider/provider.dart';
 
 class BookmartIconWidget extends StatefulWidget {
   final Tourism tourism;
@@ -11,19 +14,17 @@ class BookmartIconWidget extends StatefulWidget {
 }
 
 class _BookmartIconWidgetState extends State<BookmartIconWidget> {
-  late bool _isBookmarked;
-
+  
   @override
   void initState() {
-    final tourismInList = bookmartTourismList.where(
-      (element) => element.id == widget.tourism.id,
-    );
-    setState(() {
-      if(tourismInList.isNotEmpty) {
-        _isBookmarked = true;
-      } else {
-        _isBookmarked = false;
-      }
+    final bookmarkListProvider = context.read<BookmartListProvider>();
+    final bookmarkIconProvider = context.read<BookmarkIconProvider>();
+
+    Future.microtask(() {
+      final tourismInList = bookmarkListProvider.checkItemBookmart(
+        widget.tourism,
+      );
+      bookmarkIconProvider.isBookmarked = tourismInList;
     });
 
     super.initState();
@@ -33,17 +34,21 @@ class _BookmartIconWidgetState extends State<BookmartIconWidget> {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
-        setState(() {
-          if(_isBookmarked) {
-            bookmartTourismList.removeWhere((element) => element.id == widget.tourism.id);
-          } else {
-            bookmartTourismList.add(widget.tourism);
-          }
-          _isBookmarked = !_isBookmarked;
-        });
+        final bookmarkListProvider = context.read<BookmartListProvider>();
+        final bookmarkIconProvider = context.read<BookmarkIconProvider>();
+        final isBookmarked = bookmarkIconProvider.isBookmarked;
+
+        if (!isBookmarked) {
+          bookmarkListProvider.addBookmart(widget.tourism);
+        } else {
+          bookmarkListProvider.removeBookmart(widget.tourism);
+        }
+        bookmarkIconProvider.isBookmarked = !isBookmarked;
       },
       icon: Icon(
-        _isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
+        context.watch<BookmarkIconProvider>().isBookmarked
+            ? Icons.bookmark
+            : Icons.bookmark_outline,
       ),
     );
   }

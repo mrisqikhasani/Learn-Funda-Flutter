@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:practice_class/model/tourism.dart';
+import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
 import 'package:practice_class/screen/home/tourism_card_widget.dart';
 import 'package:practice_class/static/navigation_route.dart';
+import 'package:provider/provider.dart';
 
 class BookmartScreen extends StatefulWidget {
   const BookmartScreen({super.key});
@@ -15,24 +17,38 @@ class _BookmartScreenState extends State<BookmartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Bookmart List")),
-      body: ListView.builder(
-        itemCount: bookmartTourismList.length,
-        itemBuilder: (context, index) {
-          final tourism = bookmartTourismList[index];
+      body: Consumer<BookmartListProvider>(
+        builder: (context, value, child) {
+          final bookmartList = value.bookmarkList;
 
-          return TourismCard(
-            tourism: tourism,
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                NavigationRoute.detailRoute.name,
-                arguments: tourism,
-              );
-              setState(() {
-                
-              });
-            },
-          );
+          return switch (bookmartList.isNotEmpty) {
+            true => ListView.builder(
+              itemCount: bookmartList.length,
+              itemBuilder: (context, index) {
+                final tourism = bookmartList[index];
+                return TourismCard(
+                  tourism: tourism,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      NavigationRoute.detailRoute.name,
+                      arguments: tourism,
+                    );
+                    setState(() {});
+                  },
+                );
+              },
+            ),
+
+            _ => const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("No Bookmarked"),
+                ],
+              ),
+            )
+          };
         },
       ),
     );
