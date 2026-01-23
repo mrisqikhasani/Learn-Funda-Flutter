@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:practice_class/model/tourism.dart';
+import 'package:practice_class/data/model/tourism.dart';
 import 'package:practice_class/provider/detail/bookmark_icon_provider.dart';
 import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
 import 'package:provider/provider.dart';

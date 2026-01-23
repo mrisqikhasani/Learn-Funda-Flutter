@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:practice_class/model/tourism.dart';
 import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
 import 'package:practice_class/screen/home/tourism_card_widget.dart';
 import 'package:practice_class/static/navigation_route.dart';
@@ -32,7 +31,7 @@ class _BookmartScreenState extends State<BookmartScreen> {
                     Navigator.pushNamed(
                       context,
                       NavigationRoute.detailRoute.name,
-                      arguments: tourism,
+                      arguments: tourism.id,
                     );
                     setState(() {});
                   },

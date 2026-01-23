@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:practice_class/model/tourism.dart';
 import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
 import 'package:practice_class/provider/main/index_nav_provider.dart';
 import 'package:practice_class/screen/detail/detail_screen.dart';
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
       routes: {
         NavigationRoute.mainRoute.name: (context) => const MainScreen(),
         NavigationRoute.detailRoute.name: (context) => DetailScreen(
-          tourism: ModalRoute.of(context)?.settings.arguments as Tourism,
+          tourismId: ModalRoute.of(context)?.settings.arguments as int,
         ),
       },
     );
