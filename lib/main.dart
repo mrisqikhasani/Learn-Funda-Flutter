@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:practice_class/data/api/api_services.dart';
 import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
+import 'package:practice_class/provider/detail/tourism_detail_provider.dart';
+import 'package:practice_class/provider/home/tourism_list_provider.dart';
 import 'package:practice_class/provider/main/index_nav_provider.dart';
 import 'package:practice_class/screen/detail/detail_screen.dart';
 import 'package:practice_class/screen/main_screen.dart';
@@ -8,19 +11,23 @@ import 'package:practice_class/style/theme/tourism_theme.dart';
 import 'package:provider/provider.dart';
 
 void main() {
- runApp(
-   MultiProvider(
-     providers: [
-       ChangeNotifierProvider(
-         create: (context) => IndexNavProvider(),
-       ),
-       ChangeNotifierProvider(
-         create: (context) => BookmartListProvider(),
-       ),
-     ],
-     child: const MyApp(),
-   ),
- );
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => IndexNavProvider()),
+        ChangeNotifierProvider(create: (context) => BookmartListProvider()),
+        Provider(create: (context) => ApiServices()),
+        ChangeNotifierProvider(
+          create: (context) => TourismListProvider(context.read<ApiServices>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              TourismDetailProvider(context.read<ApiServices>()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

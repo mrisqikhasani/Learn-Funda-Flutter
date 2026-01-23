@@ -5,8 +5,10 @@ import 'package:practice_class/data/api/api_services.dart';
 import 'package:practice_class/data/model/tourism.dart';
 import 'package:practice_class/data/model/tourism_detail_response.dart';
 import 'package:practice_class/provider/detail/bookmark_icon_provider.dart';
+import 'package:practice_class/provider/detail/tourism_detail_provider.dart';
 import 'package:practice_class/screen/detail/body_of_detail_screen_widget.dart';
 import 'package:practice_class/screen/detail/bookmart_icon_widget.dart';
+import 'package:practice_class/static/tourism_detail_result.dart';
 import 'package:provider/provider.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -26,7 +28,13 @@ class _DetailScreenState extends State<DetailScreen> {
   void initState() {
     super.initState();
 
-    _futureTourismDetail = ApiServices().getTourismDetail(widget.tourismId);
+    // _futureTourismDetail = ApiServices().getTourismDetail(widget.tourismId);
+
+    Future.microtask(() {
+      context.read<TourismDetailProvider>().fetchTourismDetail(
+        widget.tourismId,
+      );
+    });
   }
 
   @override
@@ -37,13 +45,12 @@ class _DetailScreenState extends State<DetailScreen> {
         actions: [
           ChangeNotifierProvider(
             create: (context) => BookmarkIconProvider(),
-            child: FutureBuilder(
-              future: _completerTourism.future,
-              builder: (context, snaphot) {
-                return switch (snaphot.connectionState) {
-                  ConnectionState.done => BookmartIconWidget(
-                    tourism: snaphot.data!,
-                  ),
+            child: Consumer<TourismDetailProvider>(
+              // future: _completerTourism.future,
+              builder: (context, value, child) {
+                return switch (value.resultState) {
+                  TourismDetailLoadedState(data: var tourism) =>
+                    BookmartIconWidget(tourism: tourism),
                   _ => const SizedBox(),
                 };
               },
@@ -51,22 +58,20 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _futureTourismDetail,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const Center(child: CircularProgressIndicator());
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                return Center(child: Text(snapshot.error.toString()));
-              }
-              final tourismData = snapshot.data!.place;
-              _completerTourism.complete(tourismData);
-              return BodyOfDetailScreenWidget(tourism: tourismData);
-            default:
-              return const SizedBox();
-          }
+      body: Consumer<TourismDetailProvider>(
+        // future: _futureTourismDetail,
+        builder: (context, value, child) {
+          return switch (value.resultState) {
+            TourismDetailLoadingState() => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            TourismDetailLoadedState(data: var tourism) =>
+              BodyOfDetailScreenWidget(tourism: tourism),
+            TourismDetailErrorState(error: var message) => Center(
+              child: Text(message),
+            ),
+            _ => const SizedBox(),
+          };
         },
       ),
     );
