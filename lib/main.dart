@@ -1,33 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:practice_class/data/api/api_services.dart';
-import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
-import 'package:practice_class/provider/detail/tourism_detail_provider.dart';
-import 'package:practice_class/provider/home/tourism_list_provider.dart';
-import 'package:practice_class/provider/main/index_nav_provider.dart';
-import 'package:practice_class/screen/detail/detail_screen.dart';
-import 'package:practice_class/screen/main_screen.dart';
-import 'package:practice_class/static/navigation_route.dart';
-import 'package:practice_class/style/theme/tourism_theme.dart';
+import 'package:practice_class/provider/notification_state_provider.dart';
+import 'package:practice_class/provider/shared_references_provider.dart';
+import 'package:practice_class/screen/settting_page.dart';
+import 'package:practice_class/services/shared_preferences_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => IndexNavProvider()),
-        ChangeNotifierProvider(create: (context) => BookmartListProvider()),
-        Provider(create: (context) => ApiServices()),
-        ChangeNotifierProvider(
-          create: (context) => TourismListProvider(context.read<ApiServices>()),
-        ),
-        ChangeNotifierProvider(
-          create: (context) =>
-              TourismDetailProvider(context.read<ApiServices>()),
-        ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => NotificationStateProvider(),
+      ),
+      Provider(create: (context) => SharedPreferencesService(prefs)
+      ),
+      ChangeNotifierProvider(create: (context) => SharedPreferencesProvider(
+        context.read<SharedPreferencesService>(),
+      ))
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -36,17 +31,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tourism App',
-      theme: TourismTheme.lightTheme,
-      darkTheme: TourismTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      initialRoute: NavigationRoute.mainRoute.name,
-      routes: {
-        NavigationRoute.mainRoute.name: (context) => const MainScreen(),
-        NavigationRoute.detailRoute.name: (context) => DetailScreen(
-          tourismId: ModalRoute.of(context)?.settings.arguments as int,
-        ),
-      },
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const SettingPage(),
     );
   }
 }
