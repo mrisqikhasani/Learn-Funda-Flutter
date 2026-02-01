@@ -31,7 +31,23 @@ class Tourism {
       image: json["image"],
     );
   }
+
+  Map<String, dynamic> toJson(){
+    return <String, dynamic>{
+      "id": id,
+      "name": name,
+      "description": description,
+      "address": address,
+      "longitude": longitude,
+      "latitude": latitude,
+      "like": like,
+      "image": image
+    };
+  }
+
 }
+
+
 
 // Bookmart
 // List<Tourism> bookmartTourismList = [];

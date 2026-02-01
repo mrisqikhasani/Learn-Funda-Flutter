@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:practice_class/data/api/api_services.dart';
-import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
+import 'package:practice_class/provider/bookmark/local_database_provider.dart';
 import 'package:practice_class/provider/detail/tourism_detail_provider.dart';
 import 'package:practice_class/provider/home/tourism_list_provider.dart';
 import 'package:practice_class/provider/main/index_nav_provider.dart';
@@ -15,7 +15,6 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => IndexNavProvider()),
-        ChangeNotifierProvider(create: (context) => BookmartListProvider()),
         Provider(create: (context) => ApiServices()),
         ChangeNotifierProvider(
           create: (context) => TourismListProvider(context.read<ApiServices>()),
@@ -23,6 +22,9 @@ void main() {
         ChangeNotifierProvider(
           create: (context) =>
               TourismDetailProvider(context.read<ApiServices>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => LocalDatabaseProvider(context.read()),
         ),
       ],
       child: const MyApp(),

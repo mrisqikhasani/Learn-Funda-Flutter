@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:practice_class/provider/detail/bookmart_list_provider.dart';
+import 'package:practice_class/provider/bookmark/local_database_provider.dart';
 import 'package:practice_class/screen/home/tourism_card_widget.dart';
 import 'package:practice_class/static/navigation_route.dart';
 import 'package:provider/provider.dart';
@@ -12,13 +12,24 @@ class BookmartScreen extends StatefulWidget {
 }
 
 class _BookmartScreenState extends State<BookmartScreen> {
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      context.read<LocalDatabaseProvider>().loadAllTourism();
+    });
+
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Bookmart List")),
-      body: Consumer<BookmartListProvider>(
+      body: Consumer<LocalDatabaseProvider>(
         builder: (context, value, child) {
-          final bookmartList = value.bookmarkList;
+          final bookmartList = value.tourismList ?? [];
 
           return switch (bookmartList.isNotEmpty) {
             true => ListView.builder(
