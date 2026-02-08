@@ -1,53 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:practice_class/data/api/api_services.dart';
-import 'package:practice_class/provider/bookmark/local_database_provider.dart';
-import 'package:practice_class/provider/detail/tourism_detail_provider.dart';
-import 'package:practice_class/provider/home/tourism_list_provider.dart';
-import 'package:practice_class/provider/main/index_nav_provider.dart';
-import 'package:practice_class/screen/detail/detail_screen.dart';
-import 'package:practice_class/screen/main_screen.dart';
-import 'package:practice_class/static/navigation_route.dart';
-import 'package:practice_class/style/theme/tourism_theme.dart';
+import 'package:practice_class/providers/local_notification_providers.dart';
+import 'package:practice_class/screen/detail_screen.dart';
+import 'package:practice_class/screen/home_screen.dart';
+import 'package:practice_class/services/HttpService.dart';
+import 'package:practice_class/services/local_notification_service.dart';
+import 'package:practice_class/static/my_route.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  String route = MyRoute.home.name;
+
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => IndexNavProvider()),
-        Provider(create: (context) => ApiServices()),
-        ChangeNotifierProvider(
-          create: (context) => TourismListProvider(context.read<ApiServices>()),
-        ),
-        ChangeNotifierProvider(
-          create: (context) =>
-              TourismDetailProvider(context.read<ApiServices>()),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => LocalDatabaseProvider(context.read()),
-        ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  MultiProvider(
+    providers: [
+      Provider<HttpService>(
+        create: (_) => HttpService(),
+      ),
+
+      Provider<LocalNotificationService>(
+        create: (context) =>
+            LocalNotificationService(
+              context.read<HttpService>(),
+            )..init()
+            ..configureLocalTimeZone(),
+      ),
+
+      ChangeNotifierProvider<LocalNotificationProviders>(
+        create: (context) => LocalNotificationProviders(
+          context.read<LocalNotificationService>(),
+        )..requestPermission(),
+      ),
+    ],
+    child: App(initialRoute: route),
+  ),
+);
+
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  final String initialRoute;
+
+  const App({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tourism App',
-      theme: TourismTheme.lightTheme,
-      darkTheme: TourismTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      initialRoute: NavigationRoute.mainRoute.name,
+      initialRoute: initialRoute,
       routes: {
-        NavigationRoute.mainRoute.name: (context) => const MainScreen(),
-        NavigationRoute.detailRoute.name: (context) => DetailScreen(
-          tourismId: ModalRoute.of(context)?.settings.arguments as int,
-        ),
+        MyRoute.home.name: (context) => const HomeScreen(),
+        MyRoute.detail.name: (context) => const DetailScreen(),
       },
     );
   }
